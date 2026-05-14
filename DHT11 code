@@ -1,0 +1,95 @@
+ // DHT11 CODE 
+#include <ESP8266WiFi.h> 
+#include <DHT.h> 
+// WiFi  
+const char* ssid = "m"; 
+const char* password = "1122334455"; 
+// Pins  
+#define DHTPIN D4 
+#define DHTTYPE DHT11 
+#define LEDPIN D2 
+DHT dht(DHTPIN, DHTTYPE); 
+// Thresholds 
+float tempThreshold = 30.0; 
+float humThreshold  = 70.0; 
+void setup() { 
+  Serial.begin(115200); 
+  dht.begin(); 
+  pinMode(LEDPIN, OUTPUT); 
+  digitalWrite(LEDPIN, LOW); 
+  // Connect to WiFi 
+  Serial.println(); 
+  Serial.print("Connecting to WiFi: "); 
+  WiFi.begin(ssid, password); 
+  while (WiFi.status() != WL_CONNECTED) { 
+    delay(500); 
+    Serial.print("."); 
+  } 
+  Serial.println("\nConnected!"); 
+  Serial.print("IP Address: "); 
+  Serial.println(WiFi.localIP()); 
+} 
+void loop() { 
+  float temperature = dht.readTemperature(); 
+  float humidity = dht.readHumidity(); 
+// LM35 CODE 
+#include <ESP8266WiFi.h> 
+// WiFi Credentials 
+const char* ssid = "m"; 
+const char* password = "1122334455"; 
+// Pins 
+#define LM35PIN A0 
+#define LEDPIN D2 
+// Threshold 
+float tempThreshold = 30.0; 
+void setup() { 
+  Serial.begin(115200); 
+  pinMode(LEDPIN, OUTPUT); 
+  digitalWrite(LEDPIN, LOW); 
+  // Connect to WiFi 
+  Serial.println(); 
+  Serial.print("Connecting to WiFi: "); 
+  WiFi.begin(ssid, password); 
+  while (WiFi.status() != WL_CONNECTED) { 
+    delay(500); 
+    Serial.print("."); 
+  } 
+  Serial.println("\nConnected!"); 
+  Serial.print("IP Address: "); 
+  Serial.println(WiFi.localIP()); 
+} 
+void loop() { 
+  int analogValue = analogRead(LM35PIN); 
+  float voltage = analogValue * (3.3 / 1023.0); 
+  float temperature = voltage * 100.0; 
+  // Print values 
+  Serial.print("Analog Value: "); 
+  Serial.print(analogValue); 
+  Serial.print(" | Voltage: "); 
+Software Simulation  
+Page | 10 
+  
+ 
+  // Check sensor 
+  if (isnan(temperature) || isnan(humidity)) { 
+    Serial.println("Failed to read from DHT sensor!"); 
+    delay(2000); 
+    return; 
+  } 
+  // Print readings 
+  Serial.print("Temperature: "); 
+  Serial.print(temperature); 
+  Serial.print(" °C | Humidity: "); 
+  Serial.print(humidity); 
+  Serial.println(" %"); 
+  // Door Logic (LED) 
+  if (temperature > tempThreshold || humidity > humThreshold) { 
+    digitalWrite(LEDPIN, HIGH); 
+    Serial.println("Door Status: OPEN (LED ON)"); 
+  } else { 
+    digitalWrite(LEDPIN, LOW); 
+    Serial.println("Door Status: CLOSED (LED OFF)"); 
+  } 
+  Serial.println("--------------------------"); 
+  delay(2000); 
+}
