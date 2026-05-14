@@ -1,0 +1,49 @@
+// LM35 CODE 
+#include <ESP8266WiFi.h> 
+// WiFi Credentials 
+const char* ssid = "m"; 
+const char* password = "1122334455"; 
+// Pins 
+#define LM35PIN A0 
+#define LEDPIN D2 
+// Threshold 
+float tempThreshold = 30.0; 
+void setup() { 
+  Serial.begin(115200); 
+  pinMode(LEDPIN, OUTPUT); 
+  digitalWrite(LEDPIN, LOW); 
+  // Connect to WiFi 
+  Serial.println(); 
+  Serial.print("Connecting to WiFi: "); 
+  WiFi.begin(ssid, password); 
+  while (WiFi.status() != WL_CONNECTED) { 
+    delay(500); 
+    Serial.print("."); 
+  } 
+  Serial.println("\nConnected!"); 
+  Serial.print("IP Address: "); 
+  Serial.println(WiFi.localIP()); 
+} 
+void loop() { 
+  int analogValue = analogRead(LM35PIN); 
+  float voltage = analogValue * (3.3 / 1023.0); 
+  float temperature = voltage * 100.0; 
+  // Print values 
+  Serial.print("Analog Value: "); 
+  Serial.print(analogValue); 
+  Serial.print(" | Voltage: "); 
+ Serial.print(voltage); 
+  Serial.print(" V | Temperature: "); 
+  Serial.print(temperature); 
+  Serial.println(" °C"); 
+  // Door Logic (LED) 
+  if (temperature > tempThreshold) { 
+    digitalWrite(LEDPIN, HIGH); 
+    Serial.println("Door Status: OPEN (LED ON)"); 
+  } else { 
+    digitalWrite(LEDPIN, LOW); 
+    Serial.println("Door Status: CLOSED (LED OFF)"); 
+  } 
+  Serial.println("--------------------------"); 
+  delay(3000); 
+}
